@@ -18,7 +18,6 @@ const inputs = {
   description: 'description',
   logo: 'logo',
   version: 'version',
-  changelog: 'changelog',
   onFail: 'on_fail',
   minimumEngineVersion: 'minimum_engine_version'
 } as const
@@ -44,10 +43,7 @@ async function main(): Promise<void> {
     const logo = core.getInput(inputs.logo, { required: true })
     const destDir = core.getInput(inputs.destDir, { required: true })
     const version = core.getInput(inputs.version, { required: true })
-    const changelog = core.getMultilineInput(inputs.changelog, {
-      required: true
-    })
-    const dev = version.includes("dev") ? true : false;
+    const dev = version.includes('dev') ? true : false
     const minimumEngineVersion = core.getInput(inputs.minimumEngineVersion, {
       required: true
     })
@@ -67,7 +63,6 @@ async function main(): Promise<void> {
     const catalog = {
       version,
       url,
-      changelog,
       dev,
       minimumEngineVersion
     }
@@ -90,6 +85,19 @@ async function main(): Promise<void> {
         bucket,
         joinPath(destDir, version, 'catalog-info.yaml')
       )(`name: ${name}\nversion: ${version}\n`)
+
+      await writeFileTo(
+        s3,
+        bucket,
+        joinPath(destDir, 'changelog.json')
+      )(joinPath(srcDir, 'changelog-converted.json'))
+
+      await writeFolderToS3(
+        s3,
+        bucket,
+        joinPath(srcDir, 'docs'),
+        joinPath(destDir, version, 'docs')
+      )
 
       await updateRegistry(
         readFrom(s3, bucket, joinPath(destDir, 'index.json')),
@@ -155,6 +163,26 @@ function readFrom(
       return result.Body?.transformToString('utf-8')
     } catch (err) {
       return undefined
+    }
+  }
+}
+
+async function writeFolderToS3(
+  s3: S3,
+  bucket: string,
+  srcDir: string,
+  destDir: string
+) {
+  const entries = await fs.readdir(srcDir, { withFileTypes: true })
+
+  for (const entry of entries) {
+    const srcPath = joinPath(srcDir, entry.name)
+    const destPath = joinPath(destDir, entry.name)
+
+    if (entry.isDirectory()) {
+      await writeFolderToS3(s3, bucket, srcPath, destPath)
+    } else if (entry.isFile()) {
+      await writeFileTo(s3, bucket, destPath)(srcPath)
     }
   }
 }

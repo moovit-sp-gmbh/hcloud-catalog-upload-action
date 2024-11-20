@@ -46,9 +46,6 @@ inputs:
   version:
     description: 'Version of the new catalog'
     required: true
-  changelog:
-    description: 'Changelog with the changes in the new catalog version'
-    required: true
   minimum_engine_version:
     description: 'Minimum engine version the catalog requires'
     required: true

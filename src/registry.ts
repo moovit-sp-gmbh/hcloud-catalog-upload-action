@@ -45,7 +45,6 @@ type Registry = {
 export type CatalogVersion = {
   version: string
   url: string
-  changelog: string[]
   dev: boolean
   minimumEngineVersion?: string
 }
