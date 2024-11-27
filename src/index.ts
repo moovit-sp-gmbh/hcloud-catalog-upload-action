@@ -128,7 +128,7 @@ function readFrom(s3: S3, bucket: string, location: string): () => Promise<strin
   }
 }
 
-async function writeFolderToS3(s3: S3, bucket: string, srcDir: string, destDir: string) {
+async function writeFolderToS3(s3: S3, bucket: string, srcDir: string, destDir: string): Promise<void> {
   const entries = await fs.readdir(srcDir, { withFileTypes: true })
 
   for (const entry of entries) {
