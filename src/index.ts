@@ -68,7 +68,7 @@ async function main(): Promise<void> {
 
       await writeTo(s3, bucket, joinPath(destDir, version, 'catalog-info.yaml'))(`name: ${name}\nversion: ${version}\n`)
 
-      await writeFileTo(s3, bucket, joinPath(destDir, 'changelog.json'))(joinPath(srcDir, 'changelog-converted.json'))
+      await writeFileTo(s3, bucket, joinPath(destDir, 'changelog.json'))(joinPath(srcDir, 'changelog.json'))
 
       await writeFolderToS3(s3, bucket, joinPath(srcDir, 'docs'), joinPath(destDir, version, 'docs'))
 

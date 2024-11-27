@@ -62252,8 +62252,6 @@ const inputs = {
     description: 'description',
     logo: 'logo',
     version: 'version',
-    changelog: 'changelog',
-    dev: 'dev',
     onFail: 'on_fail',
     minimumEngineVersion: 'minimum_engine_version'
 };
@@ -62262,27 +62260,18 @@ async function main() {
         const srcDir = core.getInput(inputs.sourceDir, { required: true });
         await (0, validation_1.validateSchema)(srcDir);
         const endpoint = core.getInput(inputs.endpoint, { required: true });
-        const publicEndpoint = core.getInput(inputs.publicEndpoint, {
-            required: true
-        });
+        const publicEndpoint = core.getInput(inputs.publicEndpoint, { required: true });
         const bucket = core.getInput(inputs.bucket, { required: true });
         const region = core.getInput(inputs.region, { required: false }) ?? '';
         const accessKeyId = core.getInput(inputs.accessKeyId, { required: true });
-        const secretAccessKey = core.getInput(inputs.secretAccessKey, {
-            required: true
-        });
+        const secretAccessKey = core.getInput(inputs.secretAccessKey, { required: true });
         const name = core.getInput(inputs.name, { required: true });
         const description = core.getInput(inputs.description, { required: true });
         const logo = core.getInput(inputs.logo, { required: true });
         const destDir = core.getInput(inputs.destDir, { required: true });
         const version = core.getInput(inputs.version, { required: true });
-        const changelog = core.getMultilineInput(inputs.changelog, {
-            required: true
-        });
-        const dev = core.getBooleanInput(inputs.dev, { required: false }) ?? false;
-        const minimumEngineVersion = core.getInput(inputs.minimumEngineVersion, {
-            required: true
-        });
+        const dev = version.includes('dev') ? true : false;
+        const minimumEngineVersion = core.getInput(inputs.minimumEngineVersion, { required: true });
         const onFail = core.getInput(inputs.onFail, { required: false });
         const s3 = new client_s3_1.S3({
             endpoint,
@@ -62296,7 +62285,6 @@ async function main() {
         const catalog = {
             version,
             url,
-            changelog,
             dev,
             minimumEngineVersion
         };
@@ -62304,6 +62292,8 @@ async function main() {
             await writeFileTo(s3, bucket, (0, util_1.joinPath)(destDir, version, 'specification.json'))((0, util_1.joinPath)(srcDir, 'specification.json'));
             await writeFileTo(s3, bucket, (0, util_1.joinPath)(destDir, version, 'bundle.js'))((0, util_1.joinPath)(srcDir, 'bundle.js'));
             await writeTo(s3, bucket, (0, util_1.joinPath)(destDir, version, 'catalog-info.yaml'))(`name: ${name}\nversion: ${version}\n`);
+            await writeFileTo(s3, bucket, (0, util_1.joinPath)(destDir, 'changelog.json'))((0, util_1.joinPath)(srcDir, 'changelog.json'));
+            await writeFolderToS3(s3, bucket, (0, util_1.joinPath)(srcDir, 'docs'), (0, util_1.joinPath)(destDir, version, 'docs'));
             await (0, registry_1.updateRegistry)(readFrom(s3, bucket, (0, util_1.joinPath)(destDir, 'index.json')), writeTo(s3, bucket, (0, util_1.joinPath)(destDir, 'index.json')), { name, description, logo }, catalog);
             core.setOutput('url', (0, util_1.joinPath)(publicEndpoint, destDir));
         }
@@ -62355,6 +62345,19 @@ function readFrom(s3, bucket, location) {
             return undefined;
         }
     };
+}
+async function writeFolderToS3(s3, bucket, srcDir, destDir) {
+    const entries = await promises_1.default.readdir(srcDir, { withFileTypes: true });
+    for (const entry of entries) {
+        const srcPath = (0, util_1.joinPath)(srcDir, entry.name);
+        const destPath = (0, util_1.joinPath)(destDir, entry.name);
+        if (entry.isDirectory()) {
+            await writeFolderToS3(s3, bucket, srcPath, destPath);
+        }
+        else if (entry.isFile()) {
+            await writeFileTo(s3, bucket, destPath)(srcPath);
+        }
+    }
 }
 main();
 
@@ -62517,9 +62520,7 @@ const nodeSpecificationSchemaV1 = zod_1.z.object({
     tag: StreamNodeSpecificationTag.optional(),
     inputs: zod_1.z.array(StreamNodeSpecificationInput).optional(),
     outputs: zod_1.z.array(StreamNodeSpecificationOutput).optional(),
-    additionalConnectors: zod_1.z
-        .array(StreamNodeSpecificationAdditionalConnector)
-        .optional(),
+    additionalConnectors: zod_1.z.array(StreamNodeSpecificationAdditionalConnector).optional(),
     path: zod_1.z.string().optional(),
     customNode: StreamCustomNodeSpecification.optional()
 });
@@ -62533,16 +62534,11 @@ const nodeSpecificationSchemaV2 = zod_1.z.object({
     tag: StreamNodeSpecificationTag.array().optional(),
     inputs: zod_1.z.array(StreamNodeSpecificationInput).optional(),
     outputs: zod_1.z.array(StreamNodeSpecificationOutputV2).optional(),
-    additionalConnectors: zod_1.z
-        .array(StreamNodeSpecificationAdditionalConnector)
-        .optional(),
+    additionalConnectors: zod_1.z.array(StreamNodeSpecificationAdditionalConnector).optional(),
     path: zod_1.z.string().optional(),
     customNode: StreamCustomNodeSpecification.optional()
 });
-const nodeSpecificationSchema = zod_1.z.discriminatedUnion('specVersion', [
-    nodeSpecificationSchemaV1,
-    nodeSpecificationSchemaV2
-]);
+const nodeSpecificationSchema = zod_1.z.discriminatedUnion('specVersion', [nodeSpecificationSchemaV1, nodeSpecificationSchemaV2]);
 exports.specificationSchema = zod_1.z.object({
     nodes: zod_1.z.array(nodeSpecificationSchema),
     engineVersion: zod_1.z.string().optional(),
@@ -62619,9 +62615,7 @@ async function validateSchema(dir) {
     try {
         // we need to force a relative path and bypass the dynamic import removal by webpack
         const f = new Function('p', 'return import(p)');
-        const catalogBundle = await f(dir.startsWith('/')
-            ? path_1.default.join(dir, 'bundle.js')
-            : `.${path_1.default.sep}${path_1.default.join(dir, 'bundle.js')}`);
+        const catalogBundle = await f(dir.startsWith('/') ? path_1.default.join(dir, 'bundle.js') : `.${path_1.default.sep}${path_1.default.join(dir, 'bundle.js')}`);
         const catalog = catalogBundle['default']['default'] ?? catalogBundle['default'];
         schemas_1.catalogSchema.parse(catalog);
     }
