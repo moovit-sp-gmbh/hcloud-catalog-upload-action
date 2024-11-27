@@ -29,24 +29,18 @@ async function main(): Promise<void> {
     await validateSchema(srcDir)
 
     const endpoint = core.getInput(inputs.endpoint, { required: true })
-    const publicEndpoint = core.getInput(inputs.publicEndpoint, {
-      required: true
-    })
+    const publicEndpoint = core.getInput(inputs.publicEndpoint, { required: true })
     const bucket = core.getInput(inputs.bucket, { required: true })
     const region = core.getInput(inputs.region, { required: false }) ?? ''
     const accessKeyId = core.getInput(inputs.accessKeyId, { required: true })
-    const secretAccessKey = core.getInput(inputs.secretAccessKey, {
-      required: true
-    })
+    const secretAccessKey = core.getInput(inputs.secretAccessKey, { required: true })
     const name = core.getInput(inputs.name, { required: true })
     const description = core.getInput(inputs.description, { required: true })
     const logo = core.getInput(inputs.logo, { required: true })
     const destDir = core.getInput(inputs.destDir, { required: true })
     const version = core.getInput(inputs.version, { required: true })
     const dev = version.includes('dev') ? true : false
-    const minimumEngineVersion = core.getInput(inputs.minimumEngineVersion, {
-      required: true
-    })
+    const minimumEngineVersion = core.getInput(inputs.minimumEngineVersion, { required: true })
     const onFail = core.getInput(inputs.onFail, { required: false })
 
     const s3 = new S3({
@@ -68,36 +62,15 @@ async function main(): Promise<void> {
     }
 
     try {
-      await writeFileTo(
-        s3,
-        bucket,
-        joinPath(destDir, version, 'specification.json')
-      )(joinPath(srcDir, 'specification.json'))
+      await writeFileTo(s3, bucket, joinPath(destDir, version, 'specification.json'))(joinPath(srcDir, 'specification.json'))
 
-      await writeFileTo(
-        s3,
-        bucket,
-        joinPath(destDir, version, 'bundle.js')
-      )(joinPath(srcDir, 'bundle.js'))
+      await writeFileTo(s3, bucket, joinPath(destDir, version, 'bundle.js'))(joinPath(srcDir, 'bundle.js'))
 
-      await writeTo(
-        s3,
-        bucket,
-        joinPath(destDir, version, 'catalog-info.yaml')
-      )(`name: ${name}\nversion: ${version}\n`)
+      await writeTo(s3, bucket, joinPath(destDir, version, 'catalog-info.yaml'))(`name: ${name}\nversion: ${version}\n`)
 
-      await writeFileTo(
-        s3,
-        bucket,
-        joinPath(destDir, 'changelog.json')
-      )(joinPath(srcDir, 'changelog-converted.json'))
+      await writeFileTo(s3, bucket, joinPath(destDir, 'changelog.json'))(joinPath(srcDir, 'changelog-converted.json'))
 
-      await writeFolderToS3(
-        s3,
-        bucket,
-        joinPath(srcDir, 'docs'),
-        joinPath(destDir, version, 'docs')
-      )
+      await writeFolderToS3(s3, bucket, joinPath(srcDir, 'docs'), joinPath(destDir, version, 'docs'))
 
       await updateRegistry(
         readFrom(s3, bucket, joinPath(destDir, 'index.json')),
@@ -133,30 +106,18 @@ async function main(): Promise<void> {
   }
 }
 
-function writeTo(
-  s3: S3,
-  bucket: string,
-  location: string
-): (data: Parameters<S3['putObject']>[0]['Body']) => Promise<void> {
+function writeTo(s3: S3, bucket: string, location: string): (data: Parameters<S3['putObject']>[0]['Body']) => Promise<void> {
   return async function (data) {
     await s3.putObject({ Bucket: bucket, Key: location, Body: data })
   }
 }
-function writeFileTo(
-  s3: S3,
-  bucket: string,
-  location: string
-): (path: string) => Promise<void> {
+function writeFileTo(s3: S3, bucket: string, location: string): (path: string) => Promise<void> {
   const fn = writeTo(s3, bucket, location)
   return async function (path: string) {
     await fn(await fs.readFile(path))
   }
 }
-function readFrom(
-  s3: S3,
-  bucket: string,
-  location: string
-): () => Promise<string | undefined> {
+function readFrom(s3: S3, bucket: string, location: string): () => Promise<string | undefined> {
   return async function () {
     try {
       const result = await s3.getObject({ Bucket: bucket, Key: location })
@@ -167,12 +128,7 @@ function readFrom(
   }
 }
 
-async function writeFolderToS3(
-  s3: S3,
-  bucket: string,
-  srcDir: string,
-  destDir: string
-) {
+async function writeFolderToS3(s3: S3, bucket: string, srcDir: string, destDir: string) {
   const entries = await fs.readdir(srcDir, { withFileTypes: true })
 
   for (const entry of entries) {

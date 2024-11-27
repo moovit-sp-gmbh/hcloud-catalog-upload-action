@@ -125,9 +125,7 @@ const nodeSpecificationSchemaV1 = z.object({
   tag: StreamNodeSpecificationTag.optional(),
   inputs: z.array(StreamNodeSpecificationInput).optional(),
   outputs: z.array(StreamNodeSpecificationOutput).optional(),
-  additionalConnectors: z
-    .array(StreamNodeSpecificationAdditionalConnector)
-    .optional(),
+  additionalConnectors: z.array(StreamNodeSpecificationAdditionalConnector).optional(),
   path: z.string().optional(),
   customNode: StreamCustomNodeSpecification.optional()
 })
@@ -142,17 +140,12 @@ const nodeSpecificationSchemaV2 = z.object({
   tag: StreamNodeSpecificationTag.array().optional(),
   inputs: z.array(StreamNodeSpecificationInput).optional(),
   outputs: z.array(StreamNodeSpecificationOutputV2).optional(),
-  additionalConnectors: z
-    .array(StreamNodeSpecificationAdditionalConnector)
-    .optional(),
+  additionalConnectors: z.array(StreamNodeSpecificationAdditionalConnector).optional(),
   path: z.string().optional(),
   customNode: StreamCustomNodeSpecification.optional()
 })
 
-const nodeSpecificationSchema = z.discriminatedUnion('specVersion', [
-  nodeSpecificationSchemaV1,
-  nodeSpecificationSchemaV2
-])
+const nodeSpecificationSchema = z.discriminatedUnion('specVersion', [nodeSpecificationSchemaV1, nodeSpecificationSchemaV2])
 
 export const specificationSchema = z.object({
   nodes: z.array(nodeSpecificationSchema),
