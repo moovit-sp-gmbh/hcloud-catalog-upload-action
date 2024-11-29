@@ -15,9 +15,7 @@ export async function updateRegistry(
         }
 
     if (Array.isArray(registry.versions)) {
-      const duplicateIndex = registry.versions.findIndex(
-        c => c.url === catalog.url && c.version === catalog.version
-      )
+      const duplicateIndex = registry.versions.findIndex(c => c.url === catalog.url && c.version === catalog.version)
       if (duplicateIndex === -1) {
         registry.versions.push(catalog)
       } else {
@@ -29,9 +27,7 @@ export async function updateRegistry(
 
     await setRegistry(JSON.stringify(registry))
   } catch (err: unknown) {
-    throw new Error(
-      `Unable to update registry. Cause: ${(err as Error).message}`
-    )
+    throw new Error(`Unable to update registry. Cause: ${(err as Error).message}`)
   }
 }
 
@@ -45,7 +41,6 @@ type Registry = {
 export type CatalogVersion = {
   version: string
   url: string
-  changelog: string[]
   dev: boolean
   minimumEngineVersion?: string
 }

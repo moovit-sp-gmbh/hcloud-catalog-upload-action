@@ -19,7 +19,6 @@ describe('registry', () => {
       {
         version: '1.0.0',
         url: 'https://example.com/catalog',
-        changelog: [],
         dev: true
       }
     )
@@ -35,7 +34,6 @@ describe('registry', () => {
         {
           version: '1.0.0',
           url: 'https://example.com/catalog',
-          changelog: [],
           dev: true
         }
       ]
@@ -67,7 +65,6 @@ describe('registry', () => {
       {
         version: '1.0.0',
         url: 'https://example.com/catalog',
-        changelog: [],
         dev: true
       }
     )
@@ -83,7 +80,6 @@ describe('registry', () => {
         {
           version: '1.0.0',
           url: 'https://example.com/catalog',
-          changelog: [],
           dev: true
         }
       ]
@@ -101,7 +97,6 @@ describe('registry', () => {
           {
             version: '0.0.1',
             url: 'https://example.com/catalog',
-            changelog: [],
             dev: true
           }
         ]
@@ -123,7 +118,6 @@ describe('registry', () => {
       {
         version: '1.0.0',
         url: 'https://example.com/catalog',
-        changelog: [],
         dev: false
       }
     )
@@ -139,13 +133,11 @@ describe('registry', () => {
         {
           version: '0.0.1',
           url: 'https://example.com/catalog',
-          changelog: [],
           dev: true
         },
         {
           version: '1.0.0',
           url: 'https://example.com/catalog',
-          changelog: [],
           dev: false
         }
       ]
@@ -163,7 +155,6 @@ describe('registry', () => {
           {
             version: '1.0.0',
             url: 'https://example.com/catalog',
-            changelog: [],
             dev: true
           }
         ]
@@ -185,7 +176,6 @@ describe('registry', () => {
       {
         version: '1.0.0',
         url: 'https://example.com/catalog',
-        changelog: ['some missed docs'],
         dev: true
       }
     )
@@ -201,7 +191,6 @@ describe('registry', () => {
         {
           version: '1.0.0',
           url: 'https://example.com/catalog',
-          changelog: ['some missed docs'],
           dev: true
         }
       ]
@@ -219,7 +208,6 @@ describe('registry', () => {
           {
             version: '1.0.0',
             url: 'https://example.com/catalog',
-            changelog: [],
             dev: true
           }
         ]
@@ -242,7 +230,6 @@ describe('registry', () => {
         {
           version: '1.0.0',
           url: 'https://example.com/catalog',
-          changelog: ['some missed docs'],
           dev: true
         }
       )
@@ -259,7 +246,6 @@ describe('registry', () => {
         {
           version: '1.0.0',
           url: 'https://example.com/catalog',
-          changelog: [],
           dev: true
         }
       ]

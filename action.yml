@@ -46,19 +46,11 @@ inputs:
   version:
     description: 'Version of the new catalog'
     required: true
-  changelog:
-    description: 'Changelog with the changes in the new catalog version'
-    required: true
-  dev:
-    description: 'Flag to mark the catalog as a dev release'
-    required: false
   minimum_engine_version:
     description: 'Minimum engine version the catalog requires'
     required: true
   on_fail:
-    description:
-      'Action to take on cleanup on the upload fails. Use "delete" or leave
-      empty'
+    description: 'Action to take on cleanup on the upload fails. Use "delete" or leave empty'
     required: false
 
 # Define your outputs here.

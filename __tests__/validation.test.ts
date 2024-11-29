@@ -6,32 +6,23 @@ import { validateSchema } from '../src/validation'
 
 describe('validation', () => {
   test('it should fail on an empty dir', async () => {
-    const dir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'hcloud-catalog-testing')
-    )
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'hcloud-catalog-testing'))
 
     await expect(validateSchema(dir)).rejects.toThrow()
 
     await fs.rmdir(dir, { recursive: true })
   })
   test('it should fail on a dir with just the specification', async () => {
-    const dir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'hcloud-catalog-testing')
-    )
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'hcloud-catalog-testing'))
 
-    await fs.writeFile(
-      path.join(dir, 'specification.json'),
-      SAMPLE_SPECIFICATION
-    )
+    await fs.writeFile(path.join(dir, 'specification.json'), SAMPLE_SPECIFICATION)
 
     await expect(validateSchema(dir)).rejects.toThrow()
 
     await fs.rmdir(dir, { recursive: true })
   })
   test('it should fail on a dir with just the bundle', async () => {
-    const dir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'hcloud-catalog-testing')
-    )
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'hcloud-catalog-testing'))
 
     await fs.writeFile(path.join(dir, 'bundle.js'), SAMPLE_BUNDLE)
 
@@ -40,14 +31,9 @@ describe('validation', () => {
     await fs.rmdir(dir, { recursive: true })
   })
   test('it should pass on a dir with a valid specification and bundle', async () => {
-    const dir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'hcloud-catalog-testing')
-    )
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'hcloud-catalog-testing'))
 
-    await fs.writeFile(
-      path.join(dir, 'specification.json'),
-      SAMPLE_SPECIFICATION
-    )
+    await fs.writeFile(path.join(dir, 'specification.json'), SAMPLE_SPECIFICATION)
     await fs.writeFile(path.join(dir, 'bundle.js'), SAMPLE_BUNDLE)
 
     await expect(validateSchema(dir)).resolves.not.toThrow()
@@ -55,14 +41,9 @@ describe('validation', () => {
     await fs.rmdir(dir, { recursive: true })
   })
   test('it should fail on a dir with a valid specification and invalid bundle', async () => {
-    const dir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'hcloud-catalog-testing')
-    )
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'hcloud-catalog-testing'))
 
-    await fs.writeFile(
-      path.join(dir, 'specification.json'),
-      SAMPLE_SPECIFICATION
-    )
+    await fs.writeFile(path.join(dir, 'specification.json'), SAMPLE_SPECIFICATION)
     await fs.writeFile(path.join(dir, 'bundle.js'), SAMPLE_NON_CTOR_BUNDLE)
 
     await expect(validateSchema(dir)).rejects.toThrow()
