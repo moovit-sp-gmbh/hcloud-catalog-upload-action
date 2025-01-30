@@ -62538,7 +62538,26 @@ const nodeSpecificationSchemaV2 = zod_1.z.object({
     path: zod_1.z.string().optional(),
     customNode: StreamCustomNodeSpecification.optional()
 });
-const nodeSpecificationSchema = zod_1.z.discriminatedUnion('specVersion', [nodeSpecificationSchemaV1, nodeSpecificationSchemaV2]);
+const nodeSpecificationSchemaV3 = zod_1.z.object({
+    specVersion: zod_1.z.literal(3),
+    name: zod_1.z.string(),
+    description: zod_1.z.string(),
+    category: zod_1.z.string(),
+    version: StreamSemanticVersion,
+    author: StreamNodeSpecificationAuthor,
+    tag: StreamNodeSpecificationTag.array().optional(),
+    inputs: zod_1.z.array(StreamNodeSpecificationInput).optional(),
+    outputs: zod_1.z.array(StreamNodeSpecificationOutputV2).optional(),
+    additionalConnectors: zod_1.z.array(StreamNodeSpecificationAdditionalConnector).optional(),
+    path: zod_1.z.string().optional(),
+    customNode: StreamCustomNodeSpecification.optional(),
+    deprecated: zod_1.z.boolean()
+});
+const nodeSpecificationSchema = zod_1.z.discriminatedUnion('specVersion', [
+    nodeSpecificationSchemaV1,
+    nodeSpecificationSchemaV2,
+    nodeSpecificationSchemaV3
+]);
 exports.specificationSchema = zod_1.z.object({
     nodes: zod_1.z.array(nodeSpecificationSchema),
     engineVersion: zod_1.z.string().optional(),

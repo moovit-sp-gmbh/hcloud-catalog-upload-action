@@ -158,10 +158,14 @@ const nodeSpecificationSchemaV3 = z.object({
   additionalConnectors: z.array(StreamNodeSpecificationAdditionalConnector).optional(),
   path: z.string().optional(),
   customNode: StreamCustomNodeSpecification.optional(),
-  deprecated: z.boolean(),
+  deprecated: z.boolean()
 })
 
-const nodeSpecificationSchema = z.discriminatedUnion('specVersion', [nodeSpecificationSchemaV1, nodeSpecificationSchemaV2, nodeSpecificationSchemaV3])
+const nodeSpecificationSchema = z.discriminatedUnion('specVersion', [
+  nodeSpecificationSchemaV1,
+  nodeSpecificationSchemaV2,
+  nodeSpecificationSchemaV3
+])
 
 export const specificationSchema = z.object({
   nodes: z.array(nodeSpecificationSchema),
