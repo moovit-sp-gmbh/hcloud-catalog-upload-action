@@ -62371,15 +62371,18 @@ main();
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.updateRegistry = updateRegistry;
-async function updateRegistry(getRegistry, setRegistry, defaultRegistry, catalog) {
+async function updateRegistry(getRegistry, setRegistry, newRegistry, catalog) {
     try {
         const body = await getRegistry();
         const registry = body
             ? JSON.parse(body)
             : {
-                ...defaultRegistry,
+                ...newRegistry,
                 versions: []
             };
+        registry.description = newRegistry.description;
+        registry.name = newRegistry.name;
+        registry.logo = newRegistry.logo;
         if (Array.isArray(registry.versions)) {
             const duplicateIndex = registry.versions.findIndex(c => c.url === catalog.url && c.version === catalog.version);
             if (duplicateIndex === -1) {

@@ -1,7 +1,7 @@
 export async function updateRegistry(
   getRegistry: () => Promise<string | undefined>,
   setRegistry: (data: string) => Promise<void>,
-  defaultRegistry: Omit<Registry, 'versions'>,
+  newRegistry: Omit<Registry, 'versions'>,
   catalog: CatalogVersion
 ): Promise<void> {
   try {
@@ -10,9 +10,13 @@ export async function updateRegistry(
     const registry: Registry = body
       ? JSON.parse(body)
       : {
-          ...defaultRegistry,
+          ...newRegistry,
           versions: []
         }
+
+    registry.description = newRegistry.description
+    registry.name = newRegistry.name
+    registry.logo = newRegistry.logo
 
     if (Array.isArray(registry.versions)) {
       const duplicateIndex = registry.versions.findIndex(c => c.url === catalog.url && c.version === catalog.version)
