@@ -73,7 +73,7 @@
   "dependencies": {
     "@actions/core": "^1.10.1",
     "@aws-sdk/client-s3": "^3.614.0",
-    "@moovit-sp-gmbh/hcloud-sdk": "^13.7.0",
+    "hcloud-sdk": "^19.3.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

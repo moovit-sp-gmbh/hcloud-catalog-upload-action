@@ -1,7 +1,7 @@
 # How to do changes and release new versions
 
-Run "npm run all" after you did your changes locally, tag your latest commit with the new version, and push your commits and the tag to the repository.
-On GitHub, create a new release based on the new tag. Check the "Set as latest release" option.
+Run "npm run all" after you did your changes locally, tag your latest commit with the new version, and push your commits and the tag to the
+repository. On GitHub, create a new release based on the new tag. Check the "Set as latest release" option.
 
 # Create a GitHub Action Using TypeScript
 
