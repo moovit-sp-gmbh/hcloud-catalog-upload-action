@@ -140,7 +140,7 @@ const QuerySchema: z.ZodTypeAny = z.lazy(() =>
 const StreamNodeSpecificationDependendInput = z.intersection(
   z.object({
     name: z.string(),
-    if: QuerySchema,
+    if: QuerySchema.optional(),
     description: z.string(),
     defaultValue: z.any().optional(),
     example: z.any(),
